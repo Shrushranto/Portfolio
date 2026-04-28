@@ -1,22 +1,72 @@
-# CODING AGENTS: READ THIS FIRST
+# 🌐 Shrushranto Rajbongshi — Personal Portfolio
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+> A personal portfolio website built with **HTML**, **CSS**, and **JavaScript** to showcase my projects, skills, and experience.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+---
 
-## What you should do — IMPORTANT
+## ✨ About
 
-**Read `personal-portfolio/project/index.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+Hi, I'm **Shrushranto Rajbongshi** — a developer passionate about building thoughtful digital experiences. This portfolio is a reflection of my work, skills, and journey as a developer.
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+---
 
-## About the design files
+## 🛠️ Built With
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+| Technology | Purpose |
+|------------|---------|
+| **HTML5** | Semantic page structure |
+| **CSS3** | Styling, animations & responsive layout |
+| **JavaScript (Vanilla)** | Interactivity & dynamic behavior |
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+> No frameworks. No build tools. Just clean, hand-crafted code.
 
-## Bundle contents
+---
 
-- `personal-portfolio/README.md` — this file
-- `personal-portfolio/project/` — the `Personal Portfolio` project files (HTML prototypes, assets, components)
+## 🎨 Features
+
+- ⚡ **Fast & Lightweight** — No heavy dependencies, instant load times
+- 📱 **Fully Responsive** — Looks great on mobile, tablet, and desktop
+- 🎭 **Interactive Animations** — Smooth transitions and micro-interactions
+- 🖼️ **Profile Image Effects** — Artistic cursor-following spotlight & sketch reveal
+- 🌙 **Modern Aesthetic** — Dark-themed, glassmorphism-inspired design
+- 📄 **Resume Download** — One-click access to my latest resume
+
+---
+
+## 📁 Project Structure
+
+```
+personal-portfolio/
+├── index.html                              # Main portfolio page
+├── profile picture/                        # Profile & sketch images
+├── Shrushranto_Rajbongshi_Resume.pdf       # Downloadable resume
+└── README.md                               # You're reading this!
+```
+
+---
+
+## 🚀 Getting Started
+
+No installation needed! Simply open `index.html` in your browser:
+
+```bash
+# Clone the repository
+git clone https://github.com/Shrushranto/personal-portfolio.git
+
+# Open in browser
+open index.html
+```
+
+Or just visit the live site if deployed.
+
+---
+
+## 📬 Contact
+
+Feel free to reach out or connect with me:
+
+- **GitHub**: [github.com/Shrushranto](https://github.com/Shrushranto)
+
+---
+
+<p align="center">Made with ❤️ by <strong>Shrushranto Rajbongshi</strong></p>
