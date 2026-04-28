@@ -69,4 +69,4 @@ Feel free to reach out or connect with me:
 
 ---
 
-<p align="center">Made with ❤️ by <strong>Shrushranto Rajbongshi</strong></p>
+<p align="center"><strong>Shrushranto Rajbongshi</strong></p>
