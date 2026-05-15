@@ -38,8 +38,23 @@
         padding: 0;
       }
       html {
-        scroll-behavior: smooth;
         font-size: 17px;
+      }
+      /* Lenis smooth scrolling fixes */
+      html.lenis, html.lenis body {
+        height: auto;
+      }
+      .lenis.lenis-smooth {
+        scroll-behavior: auto !important;
+      }
+      .lenis.lenis-smooth [data-lenis-prevent] {
+        overscroll-behavior: contain;
+      }
+      .lenis.lenis-stopped {
+        overflow: hidden;
+      }
+      .lenis.lenis-scrolling iframe {
+        pointer-events: none;
       }
       body {
         background: var(--bg);
@@ -71,12 +86,15 @@
         z-index: 1;
       }
 
-      /* ── SKETCH MODE (sketch paper — warm off-white) ── */
+      /* ── SKETCH MODE (aged sketch paper) ── */
+      html:has(body.sketch-mode) {
+        font-size: 20px;
+      }
       body.sketch-mode {
-        --bg: #f2ede3;
-        --bg2: #e9e3d8;
-        --bg3: #dedad0;
-        --surface: #e5dfd4;
+        --bg: #e8debf;
+        --bg2: #ddd2b0;
+        --bg3: #d0c49e;
+        --surface: #d6cba6;
         --gold: #5a3a14;
         --gold-dim: #8a6030;
         --gold-glow: rgba(90, 58, 20, 0.12);
@@ -132,8 +150,12 @@
       }
       /* nav in sketch mode */
       body.sketch-mode nav {
-        background: rgba(240, 228, 152, 0.93);
-        border-color: rgba(107, 58, 12, 0.32);
+        background: rgba(232, 222, 191, 0.93);
+        border-color: rgba(90, 58, 20, 0.32);
+      }
+      body.sketch-mode nav.nav-scrolled {
+        background: rgba(232, 222, 191, 0.98);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       }
       body.sketch-mode nav a {
         color: var(--text-2);
@@ -151,7 +173,7 @@
       }
       /* guitar help panel in sketch mode */
       body.sketch-mode .guitar-help-panel {
-        background: rgba(240, 230, 158, 0.97);
+        background: rgba(232, 222, 191, 0.97);
         border-color: var(--border-gold);
       }
       body.sketch-mode .ghp-close {
@@ -160,9 +182,56 @@
         color: var(--text-2);
       }
       body.sketch-mode .ghp-strum-btn {
-        background: rgba(107, 58, 12, 0.07);
+        background: rgba(90, 58, 20, 0.08);
         border-color: var(--border-gold);
         color: var(--gold);
+      }
+      /* hero code syntax — pencil tones for paper */
+      body.sketch-mode .c-kw {
+        color: #6a2a8a;
+      }
+      body.sketch-mode .c-str {
+        color: #2e6b1a;
+      }
+      body.sketch-mode .c-num {
+        color: #8a4a10;
+      }
+      body.sketch-mode .c-fn {
+        color: #1d4a7a;
+      }
+      body.sketch-mode .c-red {
+        color: #8a2520;
+      }
+      /* CTA button: softer warm brown, not heavy dark */
+      body.sketch-mode .hero-cta {
+        background: var(--gold-dim);
+        color: #f5ecd2;
+      }
+      /* scroll button: light glass */
+      body.sketch-mode .hero-scroll-btn {
+        background: rgba(232, 222, 191, 0.55);
+      }
+      /* contact button hover wash needs to be brown not yellow */
+      body.sketch-mode .c-btn:hover {
+        background: rgba(90, 58, 20, 0.18);
+      }
+      /* code-edit badge: darker mint for paper */
+      body.sketch-mode .code-edit-badge {
+        color: var(--mint);
+        border-color: rgba(26, 79, 48, 0.4);
+        background: rgba(26, 79, 48, 0.06);
+      }
+      /* hero code panel border — dashed sketch feel */
+      body.sketch-mode .hero-code {
+        border-style: dashed;
+      }
+      /* photo-label gradient — warm paper instead of dark */
+      body.sketch-mode .photo-label {
+        background: linear-gradient(
+          to top,
+          rgba(60, 40, 20, 0.82),
+          transparent
+        );
       }
       /* sketch-mode transition for all themed elements */
       body.sketch-mode *,
@@ -612,13 +681,19 @@
       /* ── ABOUT ── */
       .about-grid {
         display: grid;
-        grid-template-columns: 2fr 3fr;
+        grid-template-columns: 45fr 55fr;
         gap: 4rem;
-        align-items: start;
+        /* default align-items: stretch — keeps photo + bio at same height */
+      }
+      .about-grid > div:first-child {
+        display: flex;
+        flex-direction: column;
+        min-height: 480px;
       }
       .photo-frame {
         position: relative;
-        aspect-ratio: 3/4;
+        flex: 1;
+        min-height: 480px;
         border: 1px solid var(--border-gold);
         overflow: hidden;
         background: var(--bg2);
@@ -661,6 +736,7 @@
         left: 0;
         right: 0;
         padding: 0.8rem 1rem;
+        z-index: 3;
         background: linear-gradient(
           to top,
           rgba(17, 19, 24, 0.95),
@@ -2073,10 +2149,19 @@
         z-index: 1;
       }
       .sketch-img {
-        z-index: 2;
-        mask: url(#brushMask);
+        /* kept loaded as canvas drawImage source; not rendered */
+        display: none;
       }
-      .photo-frame:hover .profile-img {
+      .profile-brush-canvas {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: inherit;
+      }
+      .photo-frame:hover .base-img {
         transform: scale(1.05);
       }
 
@@ -2623,6 +2708,7 @@
                   alt="Profile Sketch"
                   class="profile-img sketch-img"
                 />
+                <canvas class="profile-brush-canvas" id="profileBrushCanvas"></canvas>
                 <div class="photo-label">
                   <div class="pname">Shrushranto R.</div>
                   <div class="plevel">LV. 22 — Explorer</div>
@@ -2656,14 +2742,13 @@
                 <strong style="color: var(--text)"
                   >Shrushranto Rajbongshi</strong
                 >
-                — a passionate developer and creative thinker. I love building
-                things at the intersection of technology and art, whether that's
-                writing clean code, crafting melodies on my guitar, or losing
-                myself in an open-world RPG. I'm a
-                <strong style="color: var(--text)">generalist</strong> who
-                enjoys working on ambitious ideas, turning problems into
-                products, and constantly experimenting with new technologies.
-                Currently building and learning at
+                — a developer and creative thinker who builds at the
+                intersection of technology and art. A
+                <strong style="color: var(--text)">generalist</strong> at heart,
+                I enjoy turning ambitious ideas into products and constantly
+                experimenting with new tech. Off-screen, I'm usually on my
+                guitar or lost in an open-world RPG. Currently building and
+                learning at
                 <strong style="color: var(--text)">NIT Kurukshetra</strong>.
               </p>
 
@@ -2774,7 +2859,7 @@
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
                 </a>
-                <a href="#" class="bio-resume-btn">
+                <a href="Shrushranto_Rajbongshi_524110026_Resume.pdf" target="_blank" download class="bio-resume-btn">
                   <svg
                     width="13"
                     height="13"
@@ -3085,7 +3170,7 @@
           <a class="c-btn alt" href="https://github.com/Shrushranto" target="_blank">GitHub</a>
           <a class="c-btn alt" href="https://www.linkedin.com/in/shrushranto-rajbongshi-48196a230/" target="_blank">LinkedIn</a>
           <a class="c-btn alt" href="https://instagram.com/_shru_xxviii" target="_blank">Instagram</a>
-          <a class="c-btn alt" href="#">Resume ↓</a>
+          <a class="c-btn alt" href="Shrushranto_Rajbongshi_524110026_Resume.pdf" target="_blank" download>Resume</a>
         </div>
       </div>
     </div>
@@ -3753,235 +3838,198 @@
       })();
     </script>
 
-    <!-- PROFILE IMAGE REVEAL SCRIPT -->
+    <!-- PROFILE BRUSH-REVEAL CANVAS -->
     <script>
       (function () {
         const container = document.getElementById("profileContainer");
         if (!container) return;
-
+        const canvas = container.querySelector("#profileBrushCanvas");
         const sketchImg = container.querySelector(".sketch-img");
+        if (!canvas || !sketchImg) return;
+        const ctx = canvas.getContext("2d");
 
-        // Lerp variables for smooth tracking delay
-        let currentX = 0,
-          currentY = 0;
-        let targetX = 0,
-          targetY = 0;
+        // ── Sizing ────────────────────────────────────────────
+        let W = 0, H = 0;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        function resize() {
+          const rect = canvas.getBoundingClientRect();
+          W = Math.max(1, rect.width);
+          H = Math.max(1, rect.height);
+          canvas.width = Math.round(W * dpr);
+          canvas.height = Math.round(H * dpr);
+        }
+        resize();
+        window.addEventListener("resize", resize);
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(resize).observe(container);
+        }
+
+        // ── State ─────────────────────────────────────────────
+        // Each point: { x, y, t (perf-now ms), size }
+        const points = [];
+        const FADE_MS = 400;           // shortened hover trail
+        const MAX_POINTS = 220;        // hard cap to prevent runaway growth
+        const BASE_BRUSH = 64;         // baseline brush diameter
+        const MAX_BRUSH = 110;         // cap on speed-driven growth
+        const FEATHER_BLUR = 9;        // px — soft edge amount
+        const TIME_GAP = 220;          // ms — gap above which we don't connect points
+
+        let mouseX = 0, mouseY = 0;     // raw cursor target
+        let smoothX = 0, smoothY = 0;   // lerped cursor (no laggy jumps)
         let isHovering = false;
-        let rafId = null;
-        let isMobile = window.innerWidth <= 900;
+        let lastSpeed = 0;              // px/sec, smoothed
 
-        const brushEl = document.getElementById("brushEllipse");
+        // Auto-stroke (TL → BR diagonal sweep when not hovering)
+        let autoActive = false;
+        let autoProgress = 0;
+        let lastAutoEnd = Infinity;     // perf-now ms
 
-        // Trail system
-        const TRAIL_N = 8;
-        const trailEls = Array.from({ length: TRAIL_N }, (_, i) =>
-          document.getElementById(`brushTrail${i + 1}`)
-        );
-        const trailHistory = Array.from({ length: TRAIL_N }, () => ({
-          x: -999, y: -999, t: 0,
-        }));
-
-        // Brush mask sizes
-        let currentW = 0,
-          currentH = 0;
-        let targetW = 0,
-          targetH = 0;
-
-        // Angle and aspect ratio — lerped independently for smooth shape transitions
-        let currentAngle = 0,
-          targetAngle = 0;
-        let currentRatio = 1,
-          targetRatio = 1;
-
-        // Velocity tracking for brush orientation
-        let prevTargetX = 0,
-          prevTargetY = 0;
-        let smoothVx = 0,
-          smoothVy = 0;
-
-        // Stroke animation variables
-        let strokeProgress = 0;
-        let isStrokeActive = false;
-        // Stays dormant until the about section enters the viewport
-        let lastStrokeTime = Infinity;
-
-        // Arm the auto-stroke 1s after the about section first comes into view
+        // Arm the auto-stroke once the About section enters view
         const aboutSection = document.getElementById("about");
         if (aboutSection) {
-          const sectionObserver = new IntersectionObserver(
+          const obs = new IntersectionObserver(
             (entries) => {
               if (entries[0].isIntersecting) {
-                // -2000ms offset → first stroke fires 1s from now (3000 - 2000 = 1000ms)
-                lastStrokeTime = Date.now() - 2000;
-                sectionObserver.disconnect();
+                lastAutoEnd = performance.now() - 500;
+                obs.disconnect();
               }
             },
-            { threshold: 0.2 },
+            { threshold: 0.2 }
           );
-          sectionObserver.observe(aboutSection);
+          obs.observe(aboutSection);
         }
 
-        function lerp(start, end, factor) {
-          return start + (end - start) * factor;
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        function pushPoint(x, y) {
+          const now = performance.now();
+          const last = points[points.length - 1];
+
+          // Speed-based brush size (subtle growth with velocity)
+          let speed = 0;
+          if (last) {
+            const dt = now - last.t;
+            if (dt > 0 && dt < 200) {
+              const dx = x - last.x, dy = y - last.y;
+              speed = (Math.sqrt(dx * dx + dy * dy) / dt) * 1000; // px/sec
+            }
+          }
+          lastSpeed = lerp(lastSpeed, speed, 0.25);
+          const size = Math.min(BASE_BRUSH + lastSpeed * 0.04, MAX_BRUSH);
+
+          points.push({ x, y, t: now, size });
+          if (points.length > MAX_POINTS) points.shift();
         }
 
-        function animateMask() {
-          if (!isMobile) {
-            const rect = container.getBoundingClientRect();
-            const w = rect.width || 300;
-            const h = rect.height || 400;
+        // ── Render loop ───────────────────────────────────────
+        function frame() {
+          const now = performance.now();
 
-            if (!isHovering) {
-              const now = Date.now();
-              // Trigger stroke every 3 seconds
-              if (!isStrokeActive && now - lastStrokeTime > 3000) {
-                isStrokeActive = true;
-                strokeProgress = -0.2; // start off-screen top-left
-                // Prevent mask from flying across screen to start point
-                currentX = targetX = -0.2 * w;
-                currentY = targetY = -0.2 * h;
-                currentW = currentH = 0;
-              }
-
-              if (isStrokeActive) {
-                strokeProgress += 0.006;
-                if (strokeProgress > 1.2) {
-                  isStrokeActive = false;
-                  lastStrokeTime = Date.now();
-                  targetW = targetH = 0;
-                } else {
-                  targetX = strokeProgress * w;
-                  targetY = strokeProgress * h;
-                  targetW = targetH = 220;
-                  targetAngle = 45;
-                  targetRatio = 0.18;
-                }
+          if (isHovering) {
+            // Smooth cursor follow (no laggy jumps; tight tracking)
+            smoothX = lerp(smoothX, mouseX, 0.4);
+            smoothY = lerp(smoothY, mouseY, 0.4);
+            pushPoint(smoothX, smoothY);
+          } else {
+            // Auto-stroke: diagonal TL → BR exactly every 3s
+            if (!autoActive && now - lastAutoEnd > 3000) {
+              autoActive = true;
+              autoProgress = -0.15;
+            }
+            if (autoActive) {
+              autoProgress += 0.004;       // slow, deliberate paint pace
+              if (autoProgress >= 1.15) {
+                autoActive = false;
+                lastAutoEnd = now;
               } else {
-                targetW = targetH = 0;
+                pushPoint(autoProgress * W, autoProgress * H);
               }
-            } else {
-              isStrokeActive = false;
-              lastStrokeTime = Date.now();
-
-              // Velocity-based brush orientation
-              smoothVx = lerp(smoothVx, targetX - prevTargetX, 0.2);
-              smoothVy = lerp(smoothVy, targetY - prevTargetY, 0.2);
-              prevTargetX = targetX;
-              prevTargetY = targetY;
-
-              const speed = Math.sqrt(
-                smoothVx * smoothVx + smoothVy * smoothVy,
-              );
-              const elongation = Math.min(speed * 7, 75);
-
-              // Normalize to -90..90 (ellipse is symmetric at 180°)
-              let a = ((Math.atan2(smoothVy, smoothVx) * 180) / Math.PI) % 180;
-              if (a > 90) a -= 180;
-              if (a < -90) a += 180;
-              targetAngle = a;
-              targetRatio = Math.max(1 - elongation / 85, 0.15);
-              targetW = targetH = 130;
             }
-
-            // Smooth tracking
-            const lerpFactor = isHovering ? 0.1 : 0.07;
-            currentX = lerp(currentX, targetX, lerpFactor);
-            currentY = lerp(currentY, targetY, lerpFactor);
-            currentW = lerp(currentW, targetW, 0.09);
-            currentH = lerp(currentH, targetH, 0.09);
-            currentAngle = lerp(currentAngle, targetAngle, 0.08);
-            currentRatio = lerp(currentRatio, targetRatio, 0.08);
-
-            // Update inline SVG ellipse — no data URI, no flicker
-            const headRx = currentW / 2;
-            const headRy = headRx * currentRatio;
-            if (brushEl) {
-              brushEl.setAttribute("cx", currentX);
-              brushEl.setAttribute("cy", currentY);
-              brushEl.setAttribute("rx", headRx);
-              brushEl.setAttribute("ry", headRy);
-              brushEl.setAttribute(
-                "transform",
-                `rotate(${currentAngle} ${currentX} ${currentY})`,
-              );
-            }
-
-            // Trail: push new point only when mouse moved > 3px
-            const _dx = currentX - trailHistory[0].x;
-            const _dy = currentY - trailHistory[0].y;
-            if (_dx * _dx + _dy * _dy > 9) {
-              for (let i = TRAIL_N - 1; i > 0; i--) {
-                trailHistory[i].x = trailHistory[i - 1].x;
-                trailHistory[i].y = trailHistory[i - 1].y;
-                trailHistory[i].t = trailHistory[i - 1].t;
-              }
-              trailHistory[0].x = currentX;
-              trailHistory[0].y = currentY;
-              trailHistory[0].t = Date.now();
-            }
-            const _now = Date.now();
-            trailEls.forEach((el, i) => {
-              if (!el) return;
-              const h = trailHistory[i];
-              const ageFade = Math.max(0, 1 - (_now - h.t) / 550);
-              const sizeFade = Math.max(0, 1 - (i + 1) * 0.1);
-              const r = headRx * sizeFade * ageFade;
-              el.setAttribute("cx", h.x);
-              el.setAttribute("cy", h.y);
-              el.setAttribute("rx", r);
-              el.setAttribute("ry", r * currentRatio);
-              el.setAttribute("transform", `rotate(${currentAngle} ${h.x} ${h.y})`);
-            });
-
-            rafId = requestAnimationFrame(animateMask);
           }
+
+          // Reset transform & clear
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.scale(dpr, dpr);
+
+          // Draw brush mask: feathered, connected, time-faded
+          ctx.globalCompositeOperation = "source-over";
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.filter = `blur(${FEATHER_BLUR}px)`;
+
+          let prev = null;
+          for (let i = 0; i < points.length; i++) {
+            const p = points[i];
+            const age = now - p.t;
+            if (age > FADE_MS) continue;
+            const alpha = 1 - age / FADE_MS;
+
+            const colour = `rgba(255,255,255,${alpha})`;
+            ctx.fillStyle = colour;
+            ctx.strokeStyle = colour;
+
+            // Connect to previous point if it's recent enough → continuous stroke
+            if (prev && now - prev.t < TIME_GAP) {
+              ctx.lineWidth = (prev.size + p.size) * 0.5 * 0.65;
+              ctx.beginPath();
+              ctx.moveTo(prev.x, prev.y);
+              ctx.lineTo(p.x, p.y);
+              ctx.stroke();
+            }
+            // Soft dot at the point itself
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.32, 0, Math.PI * 2);
+            ctx.fill();
+
+            prev = p;
+          }
+
+          ctx.filter = "none";
+
+          // Composite the sketch image through the brush alpha
+          if (sketchImg.complete && sketchImg.naturalWidth > 0) {
+            ctx.globalCompositeOperation = "source-in";
+            ctx.drawImage(sketchImg, 0, 0, W, H);
+            ctx.globalCompositeOperation = "source-over";
+          }
+
+          // Drop fully-faded points off the front of the queue
+          while (points.length && now - points[0].t > FADE_MS) points.shift();
+
+          requestAnimationFrame(frame);
         }
 
-        if (!isMobile) {
-          rafId = requestAnimationFrame(animateMask);
+        function start() { requestAnimationFrame(frame); }
+        if (sketchImg.complete && sketchImg.naturalWidth > 0) start();
+        else sketchImg.addEventListener("load", start, { once: true });
+
+        // ── Input ─────────────────────────────────────────────
+        function setMouseFromEvent(e) {
+          const rect = canvas.getBoundingClientRect();
+          mouseX = e.clientX - rect.left;
+          mouseY = e.clientY - rect.top;
         }
-
-        container.addEventListener("mousemove", (e) => {
-          if (isMobile) return;
-          const rect = container.getBoundingClientRect();
-          targetX = e.clientX - rect.left;
-          targetY = e.clientY - rect.top;
-
-          // Fix initial jump to avoid mask flying in from corner on fast enter
-          if (!isHovering) {
-            currentX = targetX;
-            currentY = targetY;
-          }
-        });
 
         container.addEventListener("mouseenter", (e) => {
-          if (isMobile) return;
+          setMouseFromEvent(e);
+          // Snap smooth-cursor to the entry point so there's no fly-in
+          smoothX = mouseX;
+          smoothY = mouseY;
           isHovering = true;
+          autoActive = false;
+        });
+        container.addEventListener("mousemove", setMouseFromEvent);
+        container.addEventListener("mouseleave", () => { 
+          isHovering = false; 
+          lastAutoEnd = performance.now() - 1000; // exact 2 second delay before next auto
         });
 
-        container.addEventListener("mouseleave", () => {
-          if (isMobile) return;
-          isHovering = false;
-        });
-
-        // Click: flip card + toggle full sketch mode
+        // Click: flip card + toggle global sketch-mode (preserved)
         container.addEventListener("click", () => {
           container.classList.toggle("flipped");
           document.body.classList.toggle("sketch-mode");
-        });
-
-        window.addEventListener("resize", () => {
-          isMobile = window.innerWidth <= 900;
-          if (isMobile) {
-            if (brushEl) {
-              brushEl.setAttribute("rx", 0);
-              brushEl.setAttribute("ry", 0);
-            }
-            if (rafId) {
-              cancelAnimationFrame(rafId);
-              rafId = null;
-            }
-          }
         });
       })();
     </script>
@@ -4207,5 +4255,117 @@
       })();
     </script>
 
+    <!-- Cinematic Smooth Scroll & Reveal System -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+      (function() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          direction: 'vertical',
+          gestureDirection: 'vertical',
+          smooth: true,
+          smoothTouch: false,
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+          lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+
+        document.documentElement.classList.add('lenis-ready');
+
+        const singleItems = gsap.utils.toArray('.s-label, .s-title, .hero-left, .hero-right');
+        const staggerGroups = [
+          { parent: '.about-grid', children: '> div' },
+          { parent: '.ic-grid', children: '.ic-card' },
+          { parent: '.projects-grid', children: '.proj-card' },
+          { parent: '.contact-content', children: '.contact-row' }
+        ];
+
+        gsap.set(singleItems, { autoAlpha: 0, y: 50 });
+        staggerGroups.forEach(group => {
+          const els = gsap.utils.toArray(`${group.parent} ${group.children}`);
+          gsap.set(els, { autoAlpha: 0, y: 50 });
+        });
+
+        singleItems.forEach((item) => {
+          gsap.to(item, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: item,
+              start: "top 85%",
+              toggleActions: "play none none none"
+            }
+          });
+        });
+
+        staggerGroups.forEach((group) => {
+          const parent = document.querySelector(group.parent);
+          const els = gsap.utils.toArray(`${group.parent} ${group.children}`);
+          if (!parent || !els.length) return;
+          
+          gsap.to(els, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1.2,
+            stagger: 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: parent,
+              start: "top 80%",
+              toggleActions: "play none none none"
+            }
+          });
+        });
+
+        const nav = document.querySelector('nav');
+        if (nav) {
+          ScrollTrigger.create({
+            start: 'top -50',
+            end: 99999,
+            toggleClass: { className: 'nav-scrolled', targets: nav }
+          });
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+              e.preventDefault();
+              lenis.scrollTo(targetEl, { offset: -50, duration: 1.5, ease: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+              if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+            }
+          });
+        });
+
+        const profileFrame = document.querySelector('.photo-frame');
+        if (profileFrame) {
+          gsap.fromTo(profileFrame, 
+            { y: -30, scale: 0.96 }, 
+            { 
+              y: 30, scale: 1.02, 
+              ease: "none",
+              scrollTrigger: {
+                trigger: '.about-grid',
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.2
+              }
+            }
+          );
+        }
+      })();
+    </script>
   </body>
 </html>
